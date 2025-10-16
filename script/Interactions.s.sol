@@ -12,7 +12,7 @@ contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256, address) {
         HelperConfig helperConfig = new HelperConfig();
         address vrfCoordinator = helperConfig.getConfig().vrfCoordinator;
-        (uint256 subId, ) = createSubscription(vrfCoordinator);
+        (uint256 subId,) = createSubscription(vrfCoordinator);
         return (subId, vrfCoordinator);
     }
 
@@ -26,6 +26,7 @@ contract CreateSubscription is Script {
         console.log("Please update the subscriptionId in HelperConfig.s.sol");
         return (subId, vrfCoordinator);
     }
+
     function run() public {
         createSubscriptionUsingConfig();
     }
@@ -47,12 +48,11 @@ contract FundSubscription is Script, CodeConstants {
         console.log("Using VRF Coordinator: ", vrfCoordinator);
         console.log("On ChainId: ", block.chainid);
 
-        if(block.chainid == LOCAL_CHAINID) {
+        if (block.chainid == LOCAL_CHAINID) {
             vm.startBroadcast();
             VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_AMOUNT);
             vm.stopBroadcast();
-        }
-        else {
+        } else {
             vm.startBroadcast();
             LinkToken(linkToken).transferAndCall(vrfCoordinator, FUND_AMOUNT, abi.encode(subscriptionId));
             vm.stopBroadcast();
@@ -65,7 +65,6 @@ contract FundSubscription is Script, CodeConstants {
 }
 
 contract AddConsumer is Script, CodeConstants {
-
     function addConsumerUsingConfig(address mostRecentDeployment) public {
         HelperConfig helperConfig = new HelperConfig();
         uint256 subId = helperConfig.getConfig().subscriptionId;
@@ -87,5 +86,4 @@ contract AddConsumer is Script, CodeConstants {
         address mostRecentDeployment = DevOpsTools.get_most_recent_deployment("Raffle", block.chainid);
         addConsumerUsingConfig(mostRecentDeployment);
     }
-
 }

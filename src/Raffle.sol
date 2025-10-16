@@ -73,7 +73,7 @@ contract Raffle is VRFConsumerBaseV2Plus {
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
         i_entranceFee = entranceFee;
-        // @dev The duration of the lottery in seconds 
+        // @dev The duration of the lottery in seconds
         i_interval = interval;
         s_lastTimeStamp = block.timestamp;
         i_keyHash = gasLane;
@@ -84,10 +84,11 @@ contract Raffle is VRFConsumerBaseV2Plus {
 
     function enterRaffle() external payable {
         // require(msg.value >= i_entranceFee, "You need to send more ETH to cover the entrance fee");
-        if (msg.value < i_entranceFee) { // this is more gas efficient than require
+        if (msg.value < i_entranceFee) {
+            // this is more gas efficient than require
             revert Raffle__NotEnoughETHEntered();
         }
-            if (s_raffleState != RaffleState.OPEN) {
+        if (s_raffleState != RaffleState.OPEN) {
             revert Raffle__RaffleNotOpen();
         }
         s_players.push(payable(msg.sender));
@@ -114,24 +115,22 @@ contract Raffle is VRFConsumerBaseV2Plus {
         return (upkeepNeeded, "");
     }
 
-    function performUpkeep (bytes calldata) external {
+    function performUpkeep(bytes calldata) external {
         (bool upkeepNeeded,) = checkUpkeep("");
-        if(!upkeepNeeded) {
+        if (!upkeepNeeded) {
             revert Raffle__upkeepNotNeeded(address(this).balance, s_players.length, uint256(s_raffleState));
         }
         s_raffleState = RaffleState.CALCULATING;
-        VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest(
-            {
+        VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
             keyHash: i_keyHash,
             subId: i_subscriptionId,
             requestConfirmations: REQUEST_CONFIRMATIONS,
             callbackGasLimit: i_callbackGasLimit,
             numWords: NUM_WORDS,
             extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
-            }
-        );
-            uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
-            emit RequestedRaffleWinner(requestId); // This event will emmit twice, VRFMock will also emit it. So we can listen to it in the test file.
+        });
+        uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
+        emit RequestedRaffleWinner(requestId); // This event will emmit twice, VRFMock will also emit it. So we can listen to it in the test file.
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
@@ -143,8 +142,8 @@ contract Raffle is VRFConsumerBaseV2Plus {
         s_players = new address payable[](0);
         s_lastTimeStamp = block.timestamp;
 
-        (bool success, ) = recentWinner.call{value: address(this).balance}("");
-        if(!success) {
+        (bool success,) = recentWinner.call{value: address(this).balance}("");
+        if (!success) {
             revert Raffle__TransferFailed();
         }
         requestId; // to avoid compiler warning
