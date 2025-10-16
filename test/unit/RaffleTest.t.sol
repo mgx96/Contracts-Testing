@@ -12,12 +12,12 @@ contract RaffleTest is Test {
     Raffle public raffle;
     HelperConfig public helperConfig;
 
-        uint256 entranceFee;
-        uint256 interval;
-        address vrfCoordinator;
-        bytes32 gasLane;
-        uint256 subscriptionId;
-        uint32 callbackGasLimit;
+    uint256 entranceFee;
+    uint256 interval;
+    address vrfCoordinator;
+    bytes32 gasLane;
+    uint256 subscriptionId;
+    uint32 callbackGasLimit;
 
     address public PLAYER = makeAddr("player");
     uint256 public constant STARTING_PLAYER_BALANCE = 10 ether;
@@ -32,7 +32,7 @@ contract RaffleTest is Test {
         vm.roll(block.number + 1);
         _;
     }
-    
+
     function setUp() external {
         DeployRaffle deployer = new DeployRaffle();
         (raffle, helperConfig) = deployer.deployContract();
@@ -48,7 +48,6 @@ contract RaffleTest is Test {
     function testRaffleInitializesInOpenState() public view {
         assert(raffle.getRaffleState() == Raffle.RaffleState.OPEN);
     }
-
 
     /*//////////////////////////////////////////////////////////////
                               ENTER RAFFLE
@@ -69,7 +68,6 @@ contract RaffleTest is Test {
         address playerRecorded = raffle.getPlayer(0);
         assert(playerRecorded == PLAYER);
     }
-
 
     /*//////////////////////////////////////////////////////////////
                               EVENT TESTS
@@ -97,7 +95,7 @@ contract RaffleTest is Test {
     function testCheckUpkeepReturnsFalseIfNoBalance() public {
         vm.warp(block.timestamp + interval + 1);
         vm.roll(block.number + 1);
-        (bool upkeepNeeded, ) = raffle.checkUpkeep("");
+        (bool upkeepNeeded,) = raffle.checkUpkeep("");
         assert(!upkeepNeeded);
     }
 
@@ -109,10 +107,9 @@ contract RaffleTest is Test {
         assert(!upKeepNeeded);
     }
 
-
     /*//////////////////////////////////////////////////////////////
                              PERFORM UPKEEP
-    //////////////////////////////////////////////////////////////*/    
+    //////////////////////////////////////////////////////////////*/
 
     function testPerformUpkeepCanOnlyRunIfCheckUpkeepIsTrue() public raffleEntered {
         raffle.performUpkeep("");
@@ -125,14 +122,11 @@ contract RaffleTest is Test {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                Raffle.Raffle__upkeepNotNeeded.selector,
-                currentBalance,
-                numPlayers,
-                uint256(raffleState)
+                Raffle.Raffle__upkeepNotNeeded.selector, currentBalance, numPlayers, uint256(raffleState)
             )
         );
         raffle.performUpkeep("");
-        }
+    }
 
     function testPerformUpkeepUpdatesRaffleStateAndEmitsRequestId() public raffleEntered {
         vm.recordLogs();
@@ -148,9 +142,9 @@ contract RaffleTest is Test {
     /*//////////////////////////////////////////////////////////////
                               FUZZ TESTING
     //////////////////////////////////////////////////////////////*/
-    
-    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep (uint256 randomRequestId) public {
+
+    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public {
         vm.expectRevert(VRFCoordinatorV2_5Mock.InvalidRequest.selector);
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(randomRequestId, address(raffle));
-    }     
+    }
 }
