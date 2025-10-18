@@ -19,7 +19,7 @@ A smart contract project built with Solidity and Foundry, focused on implementin
 
 | Component  | Tool/Version       |
 |------------|---------------------|
-| Language   | Solidity ^0.8.19    |
+| Language   | Solidity ^0.8.0    |
 | Framework  | Foundry (Forge/Cast)|
 | Randomness | Chainlink VRF v2.5  |
 | Automation | Chainlink Keepers   |
