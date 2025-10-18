@@ -1,66 +1,139 @@
-## Foundry
+# Contracts-Testing
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A smart contract project built with Solidity and Foundry, focused on implementing and testing a fully automated raffle system using Chainlink VRF and Keepers. This repository emphasizes unit testing, fuzz testing, and mock-based verification to ensure contract reliability.
 
-Foundry consists of:
+## Features
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+- Raffle contract using Chainlink VRF v2.5  
+- Automated upkeep using Chainlink Keepers  
+- Verifiable randomness for winner selection  
+- Extensive Foundry tests:
+  - Unit testing  
+  - Event testing  
+  - Revert condition checks  
+  - Fuzz testing  
+- Deployment and interaction scripts  
+- Mock contracts for local testing
 
-## Documentation
+## Tech Stack
 
-https://book.getfoundry.sh/
+| Component  | Tool/Version       |
+|------------|---------------------|
+| Language   | Solidity ^0.8.19    |
+| Framework  | Foundry (Forge/Cast)|
+| Randomness | Chainlink VRF v2.5  |
+| Automation | Chainlink Keepers   |
+| Testing    | forge-std & mocks   |
 
-## Usage
+## Project Structure
 
-### Build
-
-```shell
-$ forge build
+```
+Contracts-Testing/
+├── src/
+│   └── Raffle.sol
+├── test/
+│   ├── RaffleTest.t.sol
+│   └── Mocks/
+│       └── LinkToken.sol
+├── script/
+│   ├── DeployRaffle.s.sol
+│   ├── HelperConfig.s.sol
+│   └── Interactions.s.sol
+└── foundry.toml
 ```
 
-### Test
+## Getting Started
 
-```shell
-$ forge test
+### 1. Install Foundry
+
+```
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
 ```
 
-### Format
+### 2. Install Dependencies
 
-```shell
-$ forge fmt
+```
+forge install
 ```
 
-### Gas Snapshots
+### 3. Build Contracts
 
-```shell
-$ forge snapshot
+```
+forge build
 ```
 
-### Anvil
+### 4. Run Tests
 
-```shell
-$ anvil
+```
+forge test
 ```
 
-### Deploy
+To see verbose output:
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+forge test -vvv
 ```
 
-### Cast
+## Key Contracts
 
-```shell
-$ cast <subcommand>
+### Raffle.sol
+Implements:
+- Entrance fee logic  
+- Randomness request via VRF  
+- State transitions (OPEN → CALCULATING)  
+- Event emissions  
+- ETH transfers to winners
+
+### HelperConfig.s.sol
+Manages:
+- Local vs Sepolia configuration  
+- Mock deployment on local networks
+
+### DeployRaffle.s.sol
+Responsible for:
+- Config retrieval  
+- Deployment  
+- Subscription setup
+
+### Interactions.s.sol
+Includes scripts to:
+- Create subscriptions  
+- Fund subscriptions  
+- Add consumer contracts
+
+## Testing
+
+All tests are in `test/RaffleTest.t.sol` and cover:
+
+- Initial state validation  
+- Reverts when insufficient ETH is sent  
+- Player recording  
+- Event emissions  
+- Rejecting entries while CALCULATING  
+- `checkUpkeep` logic  
+- `performUpkeep` behavior  
+- Fuzz tests on VRF fulfillment
+
+Example:
+
+```
+forge test --match-test testRaffleRevertsWhenYouDontPayEnough
 ```
 
-### Help
+## License
 
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+MIT License
+
+Copyright (c) 2025
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
