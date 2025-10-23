@@ -25,22 +25,6 @@ A smart contract project built with Solidity and Foundry, focused on implementin
 | Automation | Chainlink Keepers   |
 | Testing    | forge-std & mocks   |
 
-## Project Structure
-
-```
-Contracts-Testing/
-├── src/
-│   └── Raffle.sol
-├── test/
-│   ├── RaffleTest.t.sol
-│   └── Mocks/
-│       └── LinkToken.sol
-├── script/
-│   ├── DeployRaffle.s.sol
-│   ├── HelperConfig.s.sol
-│   └── Interactions.s.sol
-└── foundry.toml
-```
 
 ## Getting Started
 
